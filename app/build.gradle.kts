@@ -39,6 +39,12 @@ android {
     buildFeatures {
         compose = true
     }
+
+    kotlin {
+        compilerOptions {
+            freeCompilerArgs.add("-Xcontext-parameters")
+        }
+    }
 }
 
 dependencies {
