@@ -3,7 +3,10 @@ package com.sakethh.otic
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -19,15 +22,29 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -36,20 +53,27 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.sakethh.otic.ui.theme.OticTheme
 
 class OticActivity : ComponentActivity() {
+
+    val mainHandler = Handler(Looper.getMainLooper())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val oticServiceIntent = Intent(this@OticActivity, OticService::class.java)
         enableEdgeToEdge()
+        val oticServiceIntent = Intent(this@OticActivity, OticService::class.java)
         setContent {
             val oticVM = viewModel<OticVM>(factory = viewModelFactory {
                 initializer {
                     OticVM(this@OticActivity)
                 }
             })
+            val localFocusManager = LocalFocusManager.current
             val runtimePermissionsLauncher =
                 rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissionsMap: Map<String, Boolean> ->
                     oticVM.updatePermissionsGrantedState(permissionsMap.all { it.value })
                 }
+            var serverPort by rememberSaveable(OticService.serverPort) {
+                mutableIntStateOf(OticService.serverPort)
+            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -62,9 +86,11 @@ class OticActivity : ComponentActivity() {
                     Surface {
                         Column(
                             modifier = Modifier
+                                .clickable(enabled = false, onClick = {})
                                 .fillMaxWidth()
                                 .navigationBarsPadding(),
                         ) {
+                            HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 5.dp)
                             Spacer(modifier = Modifier.height(10.dp))
                             Row(modifier = Modifier.padding(start = 15.dp)) {
                                 Text(
@@ -75,6 +101,67 @@ class OticActivity : ComponentActivity() {
                                 )
                                 Spacer(modifier = Modifier.width(2.5.dp))
                                 Text(text = "v1.0.0", modifier = Modifier.alignByBaseline())
+                            }
+                            Spacer(modifier = Modifier.height(10.dp))
+                            AnimatedVisibility(oticVM.allPermissionsGranted && !OticService.isServiceRunning) {
+                                OutlinedTextField(
+                                    shape = RoundedCornerShape(25.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 15.dp, end = 15.dp)
+                                        .imePadding(),
+                                    label = {
+                                        Text(
+                                            text = "Port",
+                                        )
+                                    },
+                                    supportingText = {
+                                        AnimatedVisibility(serverPort in 0..65535 && serverPort != OticService.serverPort) {
+                                            Text(
+                                                text = "Confirm port change using your keyboard",
+                                                fontWeight = FontWeight.Bold
+                                            )
+                                        }
+
+                                        AnimatedVisibility(serverPort !in 0..65535) {
+                                            Text(
+                                                text = OticVM.VALID_PORT_MSG,
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        }
+                                    },
+                                    isError = serverPort !in 0..65535,
+                                    value = serverPort.toString(),
+                                    onValueChange = {
+                                        try {
+                                            serverPort = it.toInt()
+                                        } catch (_: Exception) {
+
+                                        }
+                                    },
+                                    keyboardOptions = KeyboardOptions(
+                                        imeAction = ImeAction.Done,
+                                        keyboardType = KeyboardType.Number
+                                    ),
+                                    keyboardActions = KeyboardActions(onDone = {
+                                        oticVM.updatePersistedPortNumber(
+                                            value = serverPort,
+                                            onCompletion = {
+                                                mainHandler.post {
+                                                    localFocusManager.clearFocus(force = true)
+                                                }
+                                                OticService.updateServerPort(serverPort)
+                                            },
+                                            onError = {
+                                                mainHandler.post {
+                                                    Toast.makeText(
+                                                        this@OticActivity, it, Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
+                                            })
+                                    }),
+                                    readOnly = OticService.isServiceRunning
+                                )
                             }
                             AnimatedVisibility(!oticVM.allPermissionsGranted) {
                                 Text(
@@ -90,28 +177,30 @@ class OticActivity : ComponentActivity() {
                                     text = "Streaming on ${OticService.ipv4Address ?: "null"}:${OticService.serverPort}"
                                 )
                             }
-                            Button(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 15.dp, end = 15.dp), onClick = {
-                                    if (!oticVM.allPermissionsGranted) {
-                                        runtimePermissionsLauncher.launch(OticService.permissions.toTypedArray())
-                                        return@Button
-                                    }
+                            AnimatedVisibility(serverPort in 0..65535) {
+                                Button(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 15.dp, end = 15.dp), onClick = {
+                                        if (!oticVM.allPermissionsGranted) {
+                                            runtimePermissionsLauncher.launch(OticService.permissions.toTypedArray())
+                                            return@Button
+                                        }
 
-                                    if (OticService.isServiceRunning) {
-                                        stopService(oticServiceIntent)
-                                        return@Button
-                                    }
+                                        if (OticService.isServiceRunning) {
+                                            stopService(oticServiceIntent)
+                                            return@Button
+                                        }
 
-                                    if (Build.VERSION.SDK_INT <= 25) {
-                                        startService(oticServiceIntent)
-                                    } else {
-                                        startForegroundService(oticServiceIntent)
+                                        if (Build.VERSION.SDK_INT <= 25) {
+                                            startService(oticServiceIntent)
+                                        } else {
+                                            startForegroundService(oticServiceIntent)
+                                        }
+                                    }) {
+                                    AnimatedContent(targetState = if (!oticVM.allPermissionsGranted) "Grant" else if (!OticService.isServiceRunning) "Start Streaming" else "Stop Streaming") { text ->
+                                        Text(text = text)
                                     }
-                                }) {
-                                AnimatedContent(targetState = if (!oticVM.allPermissionsGranted) "Grant" else if (!OticService.isServiceRunning) "Start Streaming" else "Stop Streaming") { text ->
-                                    Text(text = text)
                                 }
                             }
                         }

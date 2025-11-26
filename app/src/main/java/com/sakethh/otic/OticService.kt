@@ -13,9 +13,11 @@ import android.os.Looper
 import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.NotificationCompat
+import com.sakethh.otic.OticVM.Companion.VALID_PORT_MSG
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -70,6 +72,8 @@ class OticService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        require(serverPort in 0..65535) { VALID_PORT_MSG }
+
         cleanUp()
 
         if (permissions.any { checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED }) {
@@ -116,7 +120,6 @@ class OticService : Service() {
             listOf("android.permission.RECORD_AUDIO", "android.permission.POST_NOTIFICATIONS")
         const val PERMISSION_REQUIRED_MESSAGE =
             "Grant RECORD_AUDIO (audio streaming) & POST_NOTIFICATIONS (service updates)."
-
         val ipv4Address =
             NetworkInterface.getNetworkInterfaces()?.toList()?.firstNotNullOf { networkInterface ->
                 networkInterface.inetAddresses?.toList()?.find {
@@ -124,8 +127,13 @@ class OticService : Service() {
                 }?.hostAddress
             }
 
-        // A valid port value is between 0 and 65535
-        val serverPort = 58585
+        var serverPort by mutableIntStateOf(58585)
+            private set
+
+        fun updateServerPort(port: Int) {
+            serverPort = port
+        }
+
         private const val sampleRate =
             48000 // default rate of PipeWire: https://wiki.archlinux.org/title/PipeWire, which is also the default in tumbleweed: https://en.opensuse.org/openSUSE:Pipewire
         var isServiceRunning by mutableStateOf(false)
