@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.sakethh.otic.ui.theme.OticTheme
+import com.sakethh.otic.theme.OticTheme
 
 class OticActivity : ComponentActivity() {
 
