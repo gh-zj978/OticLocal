@@ -33,6 +33,9 @@
         <service
             android:name=".OticService"
             android:foregroundServiceType="microphone" />
+
+        <receiver android:name=".StopOticService" />
+
     </application>
 
 </manifest>

@@ -1,7 +1,10 @@
 package com.sakethh.otic
 
 import android.Manifest
+import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioFormat
@@ -82,11 +85,23 @@ class OticService : Service() {
             return START_NOT_STICKY
         }
 
-        val notification = NotificationCompat.Builder(applicationContext, "1")
-            .setSmallIcon(R.drawable.app_icon)
-            .setContentTitle("Streaming the audio...")
-            .setContentText("Streaming on ${ipv4Address ?: "null"}:$serverPort")
-            .setPriority(NotificationCompat.PRIORITY_HIGH).build()
+        val cancelStreamingIntent = Intent(applicationContext, StopOticService::class.java)
+        val notification =
+            NotificationCompat.Builder(applicationContext, "1").setSmallIcon(R.drawable.app_icon)
+                .setContentTitle("Streaming the audio...")
+                .setContentText("Streaming on ${ipv4Address ?: "null"}:$serverPort")
+                .setPriority(NotificationCompat.PRIORITY_HIGH).addAction(
+                    R.drawable.app_icon, "Stop Streaming", PendingIntent.getBroadcast(
+                        applicationContext, 0, cancelStreamingIntent, PendingIntent.FLAG_IMMUTABLE
+                    )
+                ).setContentIntent(
+                    PendingIntent.getActivity(
+                        applicationContext,
+                        0,
+                        Intent(applicationContext, OticActivity::class.java),
+                        PendingIntent.FLAG_IMMUTABLE
+                    )
+                ).build()
 
         startForeground(1, notification)
         isServiceRunning = true
@@ -195,5 +210,11 @@ class OticService : Service() {
         super.onDestroy()
         cleanUp()
         logger("clearing things up")
+    }
+}
+
+class StopOticService : BroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+        context?.stopService(Intent(context, OticService::class.java))
     }
 }
