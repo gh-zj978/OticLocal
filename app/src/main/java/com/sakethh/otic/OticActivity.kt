@@ -107,7 +107,7 @@ class OticActivity : ComponentActivity() {
                                     fontFamily = googleSansFlexFontFamily
                                 )
                                 Text(
-                                    text = "v1.0.0",
+                                    text = "v1.0.1",
                                     modifier = Modifier.alignByBaseline(),
                                     fontFamily = googleSansFlexFontFamily
                                 )
