@@ -1,5 +1,4 @@
-This is a fork from sakethpathike/Otic.
-I am not actively maintaining this project.
+**This is a personal fork for self-use. Not guaranteed to be stable or maintained.**
 
 ---
 
