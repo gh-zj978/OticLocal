@@ -135,12 +135,7 @@ class OticService : Service() {
             listOf("android.permission.RECORD_AUDIO", "android.permission.POST_NOTIFICATIONS")
         const val PERMISSION_REQUIRED_MESSAGE =
             "Grant RECORD_AUDIO (audio streaming) & POST_NOTIFICATIONS (service updates)."
-        val ipv4Address =
-            NetworkInterface.getNetworkInterfaces()?.toList()?.firstNotNullOf { networkInterface ->
-                networkInterface.inetAddresses?.toList()?.find {
-                    !it.isLoopbackAddress && it is Inet4Address
-                }?.hostAddress
-            }
+        val ipv4Address = "127.0.0.1"
 
         var serverPort by mutableIntStateOf(58585)
             private set
