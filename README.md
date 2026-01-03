@@ -1,3 +1,7 @@
+This is a fork from sakethpathike/Otic
+
+---
+
 Otic lets you stream your Android device's microphone input to the local network using
 `ServerSocket` and Foreground Service.
 
