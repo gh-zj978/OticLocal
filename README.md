@@ -11,7 +11,7 @@ machine and source the audio via GStreamer:
 
 VIRTUAL_MIC_SINK="OticMic_Sink"
 VIRTUAL_MIC_SOURCE="OticMic"
-PHONE_IP="<FIND_IP_FROM_OTIC>"
+PHONE_IP="127.0.0.1"
 PORT="<FIND_PORT_FROM_OTIC>"
 
 SINK_MODULE_ID=""
