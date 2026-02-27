@@ -107,3 +107,5 @@ echo "oticlocal server is ready"
 6.`chmod +x oticlocal && chmod +x opmic`
 
 7.Add a shortcut at the desktop or `alias` in `~/.bashrc` with command `bash -lic "${PREFIX}/my_script/opmic && ${PREFIX}/my_script/oticlocal"`
+
+8.`source ~/.bashrc`
