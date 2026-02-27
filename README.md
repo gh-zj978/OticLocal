@@ -100,7 +100,7 @@ while true; do
 done
 echo "oticlocal server is ready"
 ```
-(Note: `am start` and `termux-notification-list` on Termux may sometimes fail to work.  If you have [termux-shizuku-tools](https://github.com/AlexeiCrystal/termux-shizuku-tools) installed, you can use `shizuku e am start -n com.zj978.oticlocal/.OticLocalActivity` instead for more reliable results.)
+(Note: `am start` and `termux-notification-list` on Termux may sometimes fail to work.  If you keep Shizuku running persistently and have [termux-shizuku-tools](https://github.com/AlexeiCrystal/termux-shizuku-tools) installed, you can use `shizuku e am start -n com.zj978.oticlocal/.OticLocalActivity` instead for more reliable results.)
 
 5.Establish a file named `oticlocal` containing the demo above (**Please remember to fill the port before execute it**)
 
