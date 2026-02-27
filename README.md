@@ -2,7 +2,7 @@
 
 ---
 
-OticLocal lets you stream your Android device's microphone input to the local network using
+OticLocal lets you stream your Android device's microphone input to the local loopback using
 `ServerSocket` and Foreground Service.
 
 OticLocal isn't a receiver, so you must have a custom receiver to receive the audio from the OticLocal client.
@@ -55,21 +55,19 @@ fi
 echo "Virtual microphone ready"
 echo "Connecting to $PHONE_IP:$PORT"
 
-gst-launch-1.0 -v \
-    tcpclientsrc host="$PHONE_IP" port="$PORT" ! \
-    rawaudioparse use-sink-caps=false format=pcm pcm-format=s16le sample-rate=48000 num-channels=1 ! \
-    audioconvert ! \
-    audioresample ! \
-    pulsesink device="$VIRTUAL_MIC_SINK"
+
+nc -w 3 "$PHONE_IP" "$PORT" | pacat --playback \
+    --device="$VIRTUAL_MIC_SINK" \
+    --format=s16le \
+    --rate=48000 \
+    --channels=1 \
+    --latency-msec=10
 
 echo "Stream stopped"
 ```
 
 Note that `sample-rate` must be `48000` and the `format` must be `s16le` (`pcm`), as these are the
-exact values used by the app. `<FIND_IP_FROM_OTIC>` and `<FIND_PORT_FROM_OTIC>` should also be replaced with valid values.
+exact values used by the app.  `<FIND_PORT_FROM_OTIC>` should also be replaced with valid values.
 
 Always start streaming from the app first, and then run the script. You might also want to use
 `nohup` since the stream terminates when you exit the script.
-
-## Download
-
