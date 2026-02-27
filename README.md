@@ -82,7 +82,7 @@ This demo depends on `jq nc pulseaudio termux-api termux-am`. Please configure i
 
 1.`mkdir "${PREFIX}/my_script"`
 
-2. Add `export PATH="${PATH}:${PREFIX}/my_script"` at `~/.bashrc`
+2.Add `export PATH="${PATH}:${PREFIX}/my_script"` at `~/.bashrc`
 
 3.`cd "${PREFIX}/my_script"`
 
