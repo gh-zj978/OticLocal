@@ -8,7 +8,7 @@ OticLocal lets you stream your Android device's microphone input to the local lo
 OticLocal isn't a receiver, so you must have a custom receiver to receive the audio from the OticLocal client.
 
 The easiest way to do this is to create a virtual microphone using PipeWire/PulseAudio on your Linux
-machine and source the audio via GStreamer:
+machine and source the audio via nc:
 
 ```bash
 #!/bin/bash
