@@ -88,6 +88,7 @@ This demo depends on `jq nc pulseaudio termux-api termux-am`. Please configure i
 
 4.Establish a file named `opmic` containing 
 ```bash
+#!/bin/bash
 am start --user 0 com.zj978.oticlocal/.OticLocalActivity
 while true; do
         echo 'push the start button'
