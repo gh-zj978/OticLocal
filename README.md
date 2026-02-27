@@ -2,10 +2,10 @@
 
 ---
 
-Otic lets you stream your Android device's microphone input to the local network using
+OticLocal lets you stream your Android device's microphone input to the local network using
 `ServerSocket` and Foreground Service.
 
-Otic isn't a receiver, so you must have a custom receiver to receive the audio from the Otic client.
+OticLocal isn't a receiver, so you must have a custom receiver to receive the audio from the OticLocal client.
 
 The easiest way to do this is to create a virtual microphone using PipeWire/PulseAudio on your Linux
 machine and source the audio via GStreamer:
@@ -13,8 +13,8 @@ machine and source the audio via GStreamer:
 ```bash
 #!/bin/bash
 
-VIRTUAL_MIC_SINK="OticMic_Sink"
-VIRTUAL_MIC_SOURCE="OticMic"
+VIRTUAL_MIC_SINK="OticLocalMic_Sink"
+VIRTUAL_MIC_SOURCE="OticLocalMic"
 PHONE_IP="127.0.0.1"
 PORT="<FIND_PORT_FROM_OTIC>"
 
@@ -35,7 +35,7 @@ trap cleanup EXIT INT TERM
 
 SINK_MODULE_ID=$(pactl load-module module-null-sink \
     sink_name="$VIRTUAL_MIC_SINK" \
-    sink_properties=device.description="Otic_Receiver_Sink")
+    sink_properties=device.description="OticLocal_Receiver_Sink")
 
 if [ -z "$SINK_MODULE_ID" ]; then
     echo "Failed to create virtual sink"
@@ -45,7 +45,7 @@ fi
 SOURCE_MODULE_ID=$(pactl load-module module-remap-source \
     master="$VIRTUAL_MIC_SINK.monitor" \
     source_name="$VIRTUAL_MIC_SOURCE" \
-    source_properties=device.description="Otic_Receiver")
+    source_properties=device.description="OticLocal_Receiver")
 
 if [ -z "$SOURCE_MODULE_ID" ]; then
     echo "Failed to create virtual microphone"

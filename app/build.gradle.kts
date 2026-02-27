@@ -5,13 +5,13 @@ plugins {
 }
 
 android {
-    namespace = "com.sakethh.otic"
+    namespace = "com.zj978.oticlocal"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.sakethh.otic"
+        applicationId = "com.zj978.oticlocal"
         minSdk = 24
         targetSdk = 36
         versionCode = 2

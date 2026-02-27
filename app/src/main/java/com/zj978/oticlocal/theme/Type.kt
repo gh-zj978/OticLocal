@@ -1,9 +1,9 @@
-package com.sakethh.otic.theme
+package com.zj978.oticlocal.theme
 
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import com.sakethh.otic.R
+import com.zj978.oticlocal.R
 
 val googleSansFlexFontFamily = FontFamily(
     Font(

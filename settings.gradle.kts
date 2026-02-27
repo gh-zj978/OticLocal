@@ -19,5 +19,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Otic"
+rootProject.name = "OticLocal"
 include(":app")

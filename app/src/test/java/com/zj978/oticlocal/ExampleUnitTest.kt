@@ -1,4 +1,4 @@
-package com.sakethh.otic
+package com.zj978.oticlocal
 
 import org.junit.Test
 

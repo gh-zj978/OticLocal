@@ -1,4 +1,4 @@
-package com.sakethh.otic
+package com.zj978.oticlocal
 
 import android.Manifest
 import android.app.PendingIntent
@@ -20,7 +20,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.app.NotificationCompat
-import com.sakethh.otic.OticVM.Companion.VALID_PORT_MSG
+import com.zj978.oticlocal.OticLocalVM.Companion.VALID_PORT_MSG
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,13 +28,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.OutputStream
-import java.net.Inet4Address
 import java.net.InetSocketAddress
-import java.net.NetworkInterface
 import java.net.ServerSocket
 import java.net.Socket
 
-class OticService : Service() {
+class OticLocalService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -85,7 +83,7 @@ class OticService : Service() {
             return START_NOT_STICKY
         }
 
-        val cancelStreamingIntent = Intent(applicationContext, StopOticService::class.java)
+        val cancelStreamingIntent = Intent(applicationContext, StopOticLocalService::class.java)
         val notification =
             NotificationCompat.Builder(applicationContext, "1").setSmallIcon(R.drawable.app_icon)
                 .setContentTitle("Streaming the audio...")
@@ -98,7 +96,7 @@ class OticService : Service() {
                     PendingIntent.getActivity(
                         applicationContext,
                         0,
-                        Intent(applicationContext, OticActivity::class.java),
+                        Intent(applicationContext, OticLocalActivity::class.java),
                         PendingIntent.FLAG_IMMUTABLE
                     )
                 ).build()
@@ -208,8 +206,8 @@ class OticService : Service() {
     }
 }
 
-class StopOticService : BroadcastReceiver() {
+class StopOticLocalService : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        context?.stopService(Intent(context, OticService::class.java))
+        context?.stopService(Intent(context, OticLocalService::class.java))
     }
 }

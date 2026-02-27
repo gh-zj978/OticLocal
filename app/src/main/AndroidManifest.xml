@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
-        android:name=".OticApp"
+        android:name=".OticLocalApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -17,13 +17,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Otic">
+        android:theme="@style/Theme.OticLocal">
         <activity
-            android:name=".OticActivity"
+            android:name=".OticLocalActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.Otic">
+            android:theme="@style/Theme.OticLocal">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,10 +31,10 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".OticService"
+            android:name=".OticLocalService"
             android:foregroundServiceType="microphone" />
 
-        <receiver android:name=".StopOticService" />
+        <receiver android:name=".StopOticLocalService" />
 
     </application>
 

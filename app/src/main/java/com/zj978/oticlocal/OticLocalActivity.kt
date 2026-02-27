@@ -1,4 +1,4 @@
-package com.sakethh.otic
+package com.zj978.oticlocal
 
 import android.content.Intent
 import android.os.Build
@@ -55,21 +55,21 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.sakethh.otic.theme.OticTheme
-import com.sakethh.otic.theme.googleSansFlexFontFamily
+import com.zj978.oticlocal.theme.OticLocalTheme
+import com.zj978.oticlocal.theme.googleSansFlexFontFamily
 
-class OticActivity : ComponentActivity() {
+class OticLocalActivity : ComponentActivity() {
 
     val mainHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val oticServiceIntent = Intent(this@OticActivity, OticService::class.java)
+        val oticServiceIntent = Intent(this@OticLocalActivity, OticLocalService::class.java)
         setContent {
-            val oticVM = viewModel<OticVM>(factory = viewModelFactory {
+            val oticVM = viewModel<OticLocalVM>(factory = viewModelFactory {
                 initializer {
-                    OticVM(this@OticActivity)
+                    OticLocalVM(this@OticLocalActivity)
                 }
             })
             val localFocusManager = LocalFocusManager.current
@@ -77,8 +77,8 @@ class OticActivity : ComponentActivity() {
                 rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissionsMap: Map<String, Boolean> ->
                     oticVM.updatePermissionsGrantedState(permissionsMap.all { it.value })
                 }
-            var serverPort by rememberSaveable(OticService.serverPort) {
-                mutableIntStateOf(OticService.serverPort)
+            var serverPort by rememberSaveable(OticLocalService.serverPort) {
+                mutableIntStateOf(OticLocalService.serverPort)
             }
             Box(
                 modifier = Modifier
@@ -88,7 +88,7 @@ class OticActivity : ComponentActivity() {
                     }, interactionSource = null, indication = null),
                 contentAlignment = Alignment.BottomCenter
             ) {
-                OticTheme {
+                OticLocalTheme {
                     Surface {
                         Column(
                             modifier = Modifier
@@ -100,7 +100,7 @@ class OticActivity : ComponentActivity() {
                             Spacer(modifier = Modifier.height(10.dp))
                             Row(modifier = Modifier.padding(start = 15.dp)) {
                                 Text(
-                                    text = "Otic",
+                                    text = "OticLocal",
                                     modifier = Modifier.alignByBaseline(),
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold,
@@ -113,7 +113,7 @@ class OticActivity : ComponentActivity() {
                                 )
                             }
                             Spacer(modifier = Modifier.height(10.dp))
-                            AnimatedVisibility(oticVM.allPermissionsGranted && !OticService.isServiceRunning) {
+                            AnimatedVisibility(oticVM.allPermissionsGranted && !OticLocalService.isServiceRunning) {
                                 TextField(
                                     colors = TextFieldDefaults.colors(
                                         focusedIndicatorColor = Color.Transparent,
@@ -144,7 +144,7 @@ class OticActivity : ComponentActivity() {
                                         )
                                     },
                                     supportingText = {
-                                        AnimatedVisibility(serverPort in 0..65535 && serverPort != OticService.serverPort) {
+                                        AnimatedVisibility(serverPort in 0..65535 && serverPort != OticLocalService.serverPort) {
                                             Text(
                                                 text = "Confirm port change using your keyboard",
                                                 fontWeight = FontWeight.SemiBold,
@@ -156,7 +156,7 @@ class OticActivity : ComponentActivity() {
 
                                         AnimatedVisibility(serverPort !in 0..65535) {
                                             Text(
-                                                text = OticVM.VALID_PORT_MSG,
+                                                text = OticLocalVM.VALID_PORT_MSG,
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = MaterialTheme.colorScheme.error,
                                                 fontFamily = googleSansFlexFontFamily,
@@ -185,32 +185,32 @@ class OticActivity : ComponentActivity() {
                                                 mainHandler.post {
                                                     localFocusManager.clearFocus(force = true)
                                                 }
-                                                OticService.updateServerPort(serverPort)
+                                                OticLocalService.updateServerPort(serverPort)
                                             },
                                             onError = {
                                                 mainHandler.post {
                                                     Toast.makeText(
-                                                        this@OticActivity, it, Toast.LENGTH_SHORT
+                                                        this@OticLocalActivity, it, Toast.LENGTH_SHORT
                                                     ).show()
                                                 }
                                             })
                                     }),
-                                    readOnly = OticService.isServiceRunning
+                                    readOnly = OticLocalService.isServiceRunning
                                 )
                             }
                             AnimatedVisibility(!oticVM.allPermissionsGranted) {
                                 Text(
-                                    text = OticService.PERMISSION_REQUIRED_MESSAGE,
+                                    text = OticLocalService.PERMISSION_REQUIRED_MESSAGE,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(start = 15.dp, end = 15.dp),
                                     fontFamily = googleSansFlexFontFamily
                                 )
                             }
-                            AnimatedVisibility(OticService.isServiceRunning) {
+                            AnimatedVisibility(OticLocalService.isServiceRunning) {
                                 Text(
                                     modifier = Modifier.padding(start = 15.dp, end = 15.dp),
-                                    text = "Streaming on ${OticService.ipv4Address ?: "null"}:${OticService.serverPort}",
+                                    text = "Streaming on ${OticLocalService.ipv4Address ?: "null"}:${OticLocalService.serverPort}",
                                     fontFamily = googleSansFlexFontFamily
                                 )
                             }
@@ -220,11 +220,11 @@ class OticActivity : ComponentActivity() {
                                         .fillMaxWidth()
                                         .padding(start = 15.dp, end = 15.dp), onClick = {
                                         if (!oticVM.allPermissionsGranted) {
-                                            runtimePermissionsLauncher.launch(OticService.permissions.toTypedArray())
+                                            runtimePermissionsLauncher.launch(OticLocalService.permissions.toTypedArray())
                                             return@Button
                                         }
 
-                                        if (OticService.isServiceRunning) {
+                                        if (OticLocalService.isServiceRunning) {
                                             stopService(oticServiceIntent)
                                             return@Button
                                         }
@@ -235,7 +235,7 @@ class OticActivity : ComponentActivity() {
                                             startForegroundService(oticServiceIntent)
                                         }
                                     }) {
-                                    AnimatedContent(targetState = if (!oticVM.allPermissionsGranted) "Grant" else if (!OticService.isServiceRunning) "Start Streaming" else "Stop Streaming") { text ->
+                                    AnimatedContent(targetState = if (!oticVM.allPermissionsGranted) "Grant" else if (!OticLocalService.isServiceRunning) "Start Streaming" else "Stop Streaming") { text ->
                                         Text(
                                             text = text,
                                             fontFamily = googleSansFlexFontFamily,
@@ -253,5 +253,5 @@ class OticActivity : ComponentActivity() {
 }
 
 fun logger(string: String) {
-    Log.d("OticService", string)
+    Log.d("OticLocalService", string)
 }

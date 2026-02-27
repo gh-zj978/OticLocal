@@ -1,4 +1,4 @@
-package com.sakethh.otic.theme
+package com.zj978.oticlocal.theme
 
 import androidx.compose.ui.graphics.Color
 

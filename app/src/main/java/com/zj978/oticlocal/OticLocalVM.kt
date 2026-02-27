@@ -1,4 +1,4 @@
-package com.sakethh.otic
+package com.zj978.oticlocal
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -12,7 +12,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class OticVM(context: Context) : ViewModel() {
+class OticLocalVM(context: Context) : ViewModel() {
     var allPermissionsGranted by mutableStateOf(false)
         private set
 
@@ -24,7 +24,7 @@ class OticVM(context: Context) : ViewModel() {
     private val preferencesFileName = "preferences.json"
 
     init {
-        allPermissionsGranted = OticService.permissions.all { permission ->
+        allPermissionsGranted = OticLocalService.permissions.all { permission ->
             ContextCompat.checkSelfPermission(
                 context, permission
             ) == PackageManager.PERMISSION_GRANTED
@@ -33,7 +33,7 @@ class OticVM(context: Context) : ViewModel() {
         context.filesDir.resolve(preferencesFileName).apply {
             if (!exists()) return@apply
 
-            OticService.updateServerPort(readText().run {
+            OticLocalService.updateServerPort(readText().run {
                 this.substringAfter("$PORT_NUM=").toInt()
             })
         }
