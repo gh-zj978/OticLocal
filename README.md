@@ -71,3 +71,38 @@ exact values used by the app.  `<FIND_PORT_FROM_OTIC>` should also be replaced w
 
 Always start streaming from the app first, and then run the script. You might also want to use
 `nohup` since the stream terminates when you exit the script.
+
+------
+
+Here is a personal application scenario using Termux for reference only. It cannot be guaranteed to be the best implementation or free from errors. Please adjust it according to your individual needs.
+
+This demo depends on `jq nc pulseaudio termux-api termux-am`. Please configure it properly before using it.
+
+
+
+1.`mkdir "${PREFIX}/my_script"`
+
+2. Add `export PATH="${PATH}:${PREFIX}/my_script"` at ~/.bashrc
+
+3.`cd "${PREFIX}/my_script"`
+
+4.Establish a file named `opmic` containing 
+```bash
+am start --user 0 com.zj978.oticlocal/.OticLocalActivity
+while true; do
+        echo 'push the start button'
+        result=$(termux-notification-list | jq '.[] | select(.packageName=="com.zj978.oticlocal") | {title, content, when}')
+        if [ "$result" != "" ]; then
+                break
+        fi
+        sleep 0.3
+done
+echo "oticlocal server is ready"
+```
+(Note: `am start` and `termux-notification-list` on Termux may sometimes fail to work.)
+
+5.Establish a file named `oticlocal` containing the demo above (**Please remember to fill the port before execute it**)
+
+6.`chmod +x oticlocal && chmod +x opmic`
+
+7.Add a shortcut at the desktop or `alias` in `~/.bashrc` with command `bash -lic "${PREFIX}/my_script/opmic && ${PREFIX}/my_script/oticlocal"`
