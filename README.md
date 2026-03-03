@@ -112,7 +112,7 @@ echo "oticlocal server is ready"
 
 8.最後`source ~/.bashrc`讓在`~/.bashrc`的更改被套用
 
----
+
 
 
 ## Star History
