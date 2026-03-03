@@ -1,18 +1,14 @@
-
-English | [中文（繁體）](/README_zh-TW.md)
-
-**This is a personal fork for self-use. Not guaranteed to be stable or maintained.**
+**這是一個人倉庫，不保證後續維護與是否穩定**
 
 ---
 
-OticLocal lets you stream your Android device's microphone input to the local loopback using
-`ServerSocket` and Foreground Service.
+OticLocal 是一款能讓安卓設備轉發自身麥克風輸入至本地環回網路的小工具
 
-OticLocal isn't a receiver, so you must have a custom receiver to receive the audio from the OticLocal client.
+OticLocal 並不負責接收音訊信號所以需要編寫自訂腳本來接收
 
-The easiest way to do this is to create a virtual microphone using PipeWire/PulseAudio on your Linux
-machine and source the audio via nc:
+其中一個辦法就是透過nc來接收音訊至虛擬麥克風到您安卓設備上的本地容器的PulseAudio
 
+此為一個接收腳本示例：
 ```bash
 #!/bin/bash
 
@@ -69,27 +65,27 @@ nc -w 3 "$PHONE_IP" "$PORT" | pacat --playback \
 echo "Stream stopped"
 ```
 
-Note that `sample-rate` must be `48000` and the `format` must be `s16le` (`pcm`), as these are the
-exact values used by the app.  `<FIND_PORT_FROM_OTIC>` should also be replaced with valid values.
+註： `sample-rate`與`format`必須為`48000`與`s16le`(`pcm`)否則很可能不能正常工作。此外，腳本示例中的`<FIND_PORT_FROM_OTIC>`需要按照實際設定的端口進行更改，預設為58585。
 
-Always start streaming from the app first, and then run the script. You might also want to use
-`nohup` since the stream terminates when you exit the script.
+記得使用時要先啟動OticLocal的音訊串流再跑接收腳本，同時此腳本可以按需求配合`nohup`使用
+
 
 ------
 
-Here is a personal application scenario using Termux for reference only. It cannot be guaranteed to be the best implementation or free from errors. Please adjust it according to your individual needs.
-
-This demo depends on `jq nc pulseaudio termux-api termux-am`. Please configure it properly before using it.
+在此有一個人使用於Termux上應用範例，不保證其為最佳的實現方法與不會出錯，可以按照自身需求進行更改。
 
 
+此示例依賴於`jq nc pulseaudio termux-api termux-am`，請在操作前先準備好環境。
 
-1.`mkdir "${PREFIX}/my_script"`
 
-2.Add `export PATH="${PATH}:${PREFIX}/my_script"` at `~/.bashrc`
 
-3.`cd "${PREFIX}/my_script"`
+1.先`mkdir "${PREFIX}/my_script"`建立自訂腳本資料夾
 
-4.Establish a file named `opmic` containing 
+2.然後在`~/.bashrc`上適合的位置（通常是尾部）加上`export PATH="${PATH}:${PREFIX}/my_script"`讓其可以方便呼叫
+
+3.然後`cd "${PREFIX}/my_script"`進入剛建立的資料夾
+
+4.建立一個`opmic`並填入以下內容
 ```bash
 #!/bin/bash
 am start --user 0 com.zj978.oticlocal/.OticLocalActivity
@@ -103,12 +99,12 @@ while true; do
 done
 echo "oticlocal server is ready"
 ```
-(Note: `am start` and `termux-notification-list` on Termux may sometimes fail to work.  If you keep Shizuku running persistently and have [termux-shizuku-tools](https://github.com/AlexeiCrystal/termux-shizuku-tools) installed, you can use `shizuku e 'am start -n com.zj978.oticlocal/.OticLocalActivity'` instead for more reliable results.)
+（註：`am start`與`termux-notification-list`在termux 上偶爾可能失效，如果日常常駐使用Shizuku並安裝了[termux-shizuku-tools](https://github.com/AlexeiCrystal/termux-shizuku-tools) ，那麼可以改用`shizuku e 'am start -n com.zj978.oticlocal/.OticLocalActivity'`，可能提升體驗）
 
-5.Establish a file named `oticlocal` containing the demo above (**Please remember to fill the port before execute it**)
+5.建立一個`oticlocal`並填入上方說明處的接收示例腳本(**記得更改端口的佔位文本**)
 
-6.`chmod +x oticlocal && chmod +x opmic`
+6.然後`chmod +x oticlocal && chmod +x opmic`給予執行權限
 
-7.Add a shortcut at the desktop or `alias` in `~/.bashrc` with command `bash -lic "${PREFIX}/my_script/opmic && ${PREFIX}/my_script/oticlocal"`
+7.建立一個桌面啟動器或一個`alias`別名於`~/.bashrc`並讓其可以方便執行`bash -lic "${PREFIX}/my_script/opmic && ${PREFIX}/my_script/oticlocal"`
 
-8.`source ~/.bashrc`
+8.最後`source ~/.bashrc`讓在`~/.bashrc`的更改被套用
