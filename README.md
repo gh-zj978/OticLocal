@@ -115,6 +115,10 @@ echo "oticlocal server is ready"
 
 
 
+<!--
 ## Star History
 
+
 [![Star History Chart](https://api.star-history.com/svg?repos=gh-zj978/OticLocal&type=date&legend=top-left)](https://www.star-history.com/#gh-zj978/OticLocal&type=date&legend=top-left)
+
+-->
