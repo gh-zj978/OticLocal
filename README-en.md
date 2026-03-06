@@ -3,6 +3,8 @@ English | [中文（繁體）](/README.md)
 
 **This is a personal fork for self-use. Not guaranteed to be stable or maintained.**
 
+Forked from [sakethpathike/Otic](https://github.com/sakethpathike/Otic)
+
 ---
 
 OticLocal lets you stream your Android device's microphone input to the local loopback using
